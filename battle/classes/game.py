@@ -1,5 +1,6 @@
 import random
 
+
 class bcolors(object):
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
@@ -10,8 +11,9 @@ class bcolors(object):
     BOLD = '\033[1m'
     UNDERLINE = '\033[94m'
 
+
 class Person(object):
-    def __init__(self, hp, mp, atk, df, magic, items):
+    def __init__(self, name, hp, mp, atk, df, magic, items):
         self.maxhp = hp
         self.hp = hp
         self.maxmp = mp
@@ -22,6 +24,7 @@ class Person(object):
         self.magic = magic
         self.items = items
         self.actions = ["Attack", "Magic", "Items"]
+        self.name = name
 
     def generate_damage(self):
         return random.randrange(self.atkl, self.atkh)
@@ -54,21 +57,58 @@ class Person(object):
 
     def choose_action(self):
         i = 1
-        print("\n" + bcolors.OKBLUE + bcolors.BOLD + "ACTIONS:" + bcolors.ENDC)
+        print("\n    " + bcolors.BOLD + self.name + bcolors.ENDC)
+        print(bcolors.OKBLUE + bcolors.BOLD + "    ACTIONS:" + bcolors.ENDC)
         for item in self.actions:
-            print("    " + str(i)+ ":", item)
+            print("        " + str(i) + ":", item)
             i += 1
 
     def choose_magic(self):
         i = 1
-        print("\n" + bcolors.OKBLUE + bcolors.BOLD + "MAGIC:" + bcolors.ENDC)
+        print("\n" + bcolors.OKBLUE + bcolors.BOLD + "    MAGIC:" + bcolors.ENDC)
         for spell in self.magic:
-            print("    " + str(i) + ": " + spell.name, "(cost", str(spell.cost) + ")")
+            print("        " + str(i) + ": " + spell.name, "(cost", str(spell.cost) + ")")
             i += 1
 
     def choose_item(self):
         i = 1
-        print("\n" + bcolors.OKGREEN + bcolors.BOLD + "ITEMS: " + bcolors.ENDC)
+        print("\n" + bcolors.OKGREEN + bcolors.BOLD + "    ITEMS: " + bcolors.ENDC)
         for item in self.items:
-            print("    " + str(i) + ". " + item["item"].name + ":", item["item"].description, " (x" + str(item["quantity"]) +")")
+            print("        " + str(i) + ". " + item["item"].name + ":", item["item"].description,
+                  " (x" + str(item["quantity"]) + ")")
             i += 1
+
+    def get_stats(self):
+        # print("                           _________________________            __________ ")
+        hp_bar = ""
+        hp_ticks = (self.hp/self.maxhp) * 100 / 4
+        mp_bar = ""
+        mp_ticks = (self.mp / self.maxmp) * 100 / 10
+
+        while hp_ticks > 0:
+            hp_bar += "█"
+            hp_ticks -= 1
+
+        while len(hp_bar) < 25:
+            hp_bar += " "
+
+        while mp_ticks > 0:
+            mp_bar += "█"
+            mp_ticks -= 1
+
+        while len(mp_bar) < 10:
+            mp_bar += " "
+
+        shp = ' '
+        ahp = 4 - len(str(self.hp))
+        chp = shp * ahp + str(self.hp)
+
+        smp = ' '
+        amp = 4 - len(str(self.mp))
+        cmp = smp * amp + str(self.mp)
+
+        print(bcolors.BOLD + self.name + "           " +
+              chp + "/" + str(self.maxhp) + "|" + bcolors.OKGREEN + hp_bar +
+              bcolors.ENDC + bcolors.BOLD + "|     " +
+              cmp + "/" + str(self.maxmp) + "|" + bcolors.OKBLUE + mp_bar + bcolors.ENDC +
+              bcolors.BOLD + "|" + bcolors.ENDC)
