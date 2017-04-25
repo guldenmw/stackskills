@@ -78,6 +78,37 @@ class Person(object):
                   " (x" + str(item["quantity"]) + ")")
             i += 1
 
+    def choose_target(self, enemies):
+        i = 1
+        ii = 1
+        print("\n" + bcolors.FAIL + bcolors.BOLD + "    TARGET:" + bcolors.ENDC)
+        for enemy in enemies:
+            if enemy.get_hp() != 0:
+                print("        " + str(i) + '.', enemy.name)
+                i += 1
+
+        choice = int(input("    Choose target: ")) - 1
+        return choice
+
+    def get_enemy_stats(self):
+        hp_bar = ""
+        bar_ticks = (self.hp / self.maxhp) * 100 / 2
+
+        while bar_ticks > 0:
+            hp_bar += "█"
+            bar_ticks -= 1
+
+        while len(hp_bar) < 50:
+            hp_bar += " "
+
+        shp = ' '
+        ahp = 6 - len(str(self.hp))
+        chp = shp * ahp + str(self.hp)
+
+        print(bcolors.BOLD + self.name + "        " +
+              chp + "/" + str(self.maxhp) + "|" + bcolors.FAIL + hp_bar +
+              bcolors.ENDC + bcolors.BOLD + "|     " + bcolors.ENDC)
+
     def get_stats(self):
         # print("                           _________________________            __________ ")
         hp_bar = ""
@@ -112,3 +143,16 @@ class Person(object):
               bcolors.ENDC + bcolors.BOLD + "|     " +
               cmp + "/" + str(self.maxmp) + "|" + bcolors.OKBLUE + mp_bar + bcolors.ENDC +
               bcolors.BOLD + "|" + bcolors.ENDC)
+
+    def choose_enemy_spell(self):
+        if self.mp == 0:
+
+        magic_choice = random.randrange(0, len(self.magic))
+
+        spell = self.magic[magic_choice]
+        magic_damage = spell.generate_damage()
+
+        if spell.cost > self.get_mp():
+            self.choose_enemy_spell()
+        else:
+            return spell, magic_damage
