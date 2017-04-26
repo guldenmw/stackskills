@@ -145,14 +145,18 @@ class Person(object):
               bcolors.BOLD + "|" + bcolors.ENDC)
 
     def choose_enemy_spell(self):
-        if self.mp == 0:
-
-        magic_choice = random.randrange(0, len(self.magic))
+        magic_choice = random.randrange(0, len(self.magic)-1)
+        print(len(self.magic))
+        print("magic choice = {}".format(magic_choice))
 
         spell = self.magic[magic_choice]
         magic_damage = spell.generate_damage()
 
-        if spell.cost > self.get_mp():
+        pct = self.hp / self.maxhp * 100
+
+        if spell.cost > self.mp or spell.type == "light" and pct > 50:
             self.choose_enemy_spell()
+
         else:
+            "returning spell : {}, {}".format(spell.name, magic_damage)
             return spell, magic_damage

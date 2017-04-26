@@ -49,6 +49,23 @@ enemy3 = Person("Imp  : ", 1250, 130, 560, 325, enemy_spells, [])
 players = [player1, player2, player3]
 enemies = [enemy1, enemy2, enemy3]
 
+def is_defeated():
+    defeated_enemies = [enemy.name for enemy in enemies if enemy.get_hp() == 0]
+    defeated_players = [player.name for player in players if player.get_hp() == 0]
+    print(defeated_enemies)
+    print(defeated_players)
+
+    # Check if Player won
+    if len(defeated_enemies) == 3:
+        print(bcolors.OKGREEN + "You win!" + bcolors.ENDC)
+        return False
+
+    # Check if Enemy won
+    if len(defeated_players) == 3:
+        print(bcolors.FAIL + "Your enemies have defeated you!" + bcolors.ENDC)
+        return False
+    return True
+
 running = True
 i = 0
 
@@ -165,36 +182,46 @@ while running:
                     del enemies[enemy]
 
     # Check if battle is over
-    defeated_enemies = [enemy.name for enemy in enemies if enemy.get_hp() == 0]
-    defeated_players = [player.name for player in players if player.get_hp() == 0]
 
-    # Check if Player won
-    if len(defeated_enemies) == 3:
-        print(bcolors.OKGREEN + "You win!" + bcolors.ENDC)
-        running = False
-
-    # Check if Enemy won
-    elif len(defeated_players) == 3:
-        print(bcolors.FAIL + "Your enemies have defeated you!" + bcolors.ENDC)
-        running = False
 
     # Enemy attack phase
     for enemy in enemies:
+        running = is_defeated()
+        print(enemy.name)
+        print(enemies)
         enemy_name = re.sub("[ |:]", "", enemy.name)
-        enemy_choice = random.randrange(0, 2)
+        mana_costs = [spells.cost for spells in enemy.magic]
+        print("mana costs = {}".format(mana_costs))
+
+        # Check if enemy has enough mana, otherwise pick again.
+        pick_again = True
+        while pick_again is True:
+            enemy_choice = random.randrange(0, 2)
+            if enemy_choice == 0:
+                pick_again = False
+            if enemy_choice == 1:
+                print("enemy choice is 1, checking mana")
+                mana_check = [cost for cost in mana_costs if cost < enemy.mp]
+                print("mana check = {}".format(mana_check))
+                if mana_check:
+                    pick_again = False
+
         target = random.randrange(0, len(players))
         target_name = re.sub("[ |:]", "", players[target].name)
 
         if enemy_choice == 0:
-
+            print("Final choice is 0, attacking")
             enemy_dmg = enemies[0].generate_damage()
             players[target].take_damage(enemy_dmg)
 
             print("\n" + enemy_name + " attacks " + target_name + " for " + str(enemy_dmg) + ".\n")
 
         elif enemy_choice == 1:
+            print("Final choice is 1, choosing spell")
             # Chose Spell
             spell, magic_damage = enemy.choose_enemy_spell()
+            print("Spell name = {}".format(spell.name))
+            print(magic_damage)
             enemy.reduce_mp(spell.cost)
 
             if spell.type == "light":
@@ -215,3 +242,6 @@ while running:
                     del players[target]
 
             # print("Enemy chose", spell.name, "damage is", str(magic_damage) + ".\n")
+
+
+
